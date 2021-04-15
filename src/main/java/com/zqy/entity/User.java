@@ -8,4 +8,5 @@ package com.zqy.entity;
  * @Version 1.0
  */
 public class User {
+  private String username
 }
