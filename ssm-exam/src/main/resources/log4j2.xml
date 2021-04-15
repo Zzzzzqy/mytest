@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!--All：最低等级的，用于打开所有日志记录.-->
+<!--Trace：是追踪，就是程序推进以下，你就可以写个trace输出，所以trace应该会特别多，不过没关系，我们可以设置最低日志级别不让他输出.-->
+<!--Debug：指出细粒度信息事件对调试应用程序是非常有帮助的.-->
+<!--Info：消息在粗粒度级别上突出强调应用程序的运行过程.-->
+<!--Warn：输出警告及warn以下级别的日志.-->
+<!--Error：输出错误信息日志.-->
+<!--Fatal：输出每个严重的错误事件将会导致应用程序的退出的日志.-->
+<!--OFF：最高等级的，用于关闭所有日志记录.-->
+<!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，你会看到log4j2内部各种详细输出-->
+<!--monitorInterval：Log4j能够自动检测修改配置文件和重新配置本身，设置间隔秒数-->
+<Configuration status="WARN" monitorInterval="1800">
+    <!--定义配置属性-->
+    <properties>
+        <property name="LOG_HOME">/WEB-INF/logs</property>
+        <property name="FILE_NAME">ssm</property>
+    </properties>
+
+    <!--先定义所有的appender-->
+    <Appenders>
+        <!--这个输出控制台的配置-->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!--输出日志的格式-->
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+        <!--文件会打印出所有信息，这个log每次运行程序会自动清空，由append属性决定，这个也挺有用的，适合临时测试用-->
+        <File name="log" fileName="${web:rootDir}/WEB-INF/logs/test.log" append="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+        </File>
+        <!-- 这个会打印出所有的info及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="running-log" fileName="${web:rootDir}/WEB-INF/logs/${FILE_NAME}-log.log"
+                     filePattern="${LOG_HOME}/${date:yyyy-MM}/${FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz"
+                     immediateFlush="true">
+            <!--只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）;-->
+            <!--onMatch表示匹配设定的日志级别后是DENY还是ACCEPT，onMismatch表示不匹配设定的日志级别是DENY还是ACCEPT还是NEUTRAL-->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout
+                    pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread][%file:%line] - %msg%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB" />
+            </Policies>
+            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件，这里设置了20 -->
+            <DefaultRolloverStrategy max="20" />
+        </RollingFile>
+        <param name="Encoding" value="UTF-8" />
+    </Appenders>
+    <!--然后定义logger，只有定义了logger并引入的appender，appender才会生效-->
+    <Loggers>
+        <!--过滤掉spring和mybatis的一些无用的DEBUG信息-->
+        <logger name="org.springframework" level="INFO"></logger>
+        <logger name="org.mybatis" level="INFO"></logger>
+        <!-- 下面的logger需要修改为你的项目根路径，如com.yaorange -->
+        <!--includeLocation="true"显示路径-->
+        <!--additivity为false时，被此logger处理的日志将不再进行其他处理-->
+        <logger name="com.zqy" level="debug" includeLocation="true" additivity="false">
+            <AppenderRef ref="log" />
+            <AppenderRef ref="running-log" />
+            <AppenderRef ref="Console"/>
+        </logger>
+
+        <!--设置日志输出级别：通过修改级别可以看到不同日志信息-->
+        <Root level="debug">
+            <!-- 这里是输入到文件，很重要-->
+            <AppenderRef ref="running-log" />
+            <!-- 这里是输入到控制台-->
+            <AppenderRef ref="Console" />
+        </Root>
+    </Loggers>
+</Configuration>

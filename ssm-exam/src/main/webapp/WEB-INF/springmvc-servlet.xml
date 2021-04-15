@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <!-- 自动扫描@Controller-->
+    <context:component-scan base-package="com.zqy.web"/>
+    <!--注解驱动-->
+    <mvc:annotation-driven/>
+
+    <!--可选配置-->
+    <!--静态放行-->
+    <!--1：全部资源放行 -->
+    <mvc:default-servlet-handler/>
+    <!--2：对指定目录下的静态资源放行 -->
+    <!--<mvc:resources location="/images/" mapping="/images/**"/>-->
+    <!--<mvc:resources location="/css/" mapping="/css/**"/>-->
+    <!--<mvc:resources location="/js/" mapping="/js/**"/>-->
+
+    <!--视图解析器-->
+    <!--<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
+    <!--<property name="prefix" value="/pages/"/>-->
+    <!--<property name="suffix" value=".jsp"/>-->
+    <!--</bean>-->
+
+<!--    跨域处理-->
+    <mvc:cors>
+    <!--放行所有-->
+    <!--allowed-headers="*" ：指定允许跨域请求的请求头，*标识所有-->
+    <!--allowed-origins="*" ：指定允许跨域请求的请求地址，*标识所有，一般实际开发会显式指定-->
+    <!--allowed-methods="*" ：指定允许跨域请求的请求方法，*标识所有，常用值get，post，delete，put，options-->
+    <mvc:mapping path="/**" allowed-headers="*" allowed-origins="*" allowed-methods="*"/>
+    </mvc:cors>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver"/>
+
+</beans>

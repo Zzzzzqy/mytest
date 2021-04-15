@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zqy.mapper.ProductMapper" >
+  <resultMap id="BaseResultMap" type="com.zqy.pojo.Product" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="pid" property="pid" jdbcType="INTEGER" />
+    <result column="pname" property="pname" jdbcType="VARCHAR" />
+    <result column="pimg" property="pimg" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="DOUBLE" />
+    <result column="flag" property="flag" jdbcType="VARCHAR" />
+    <result column="category_id" property="categoryId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="productAndCategory" type="Product" extends="BaseResultMap">
+    <association property="category" javaType="Category" resultMap="com.zqy.mapper.CategoryMapper.BaseResultMap"></association>
+  </resultMap>
+  <select id="getPage" resultMap="productAndCategory">
+    SELECT
+products.pid,
+products.pname,
+products.pimg,
+products.price,
+products.flag,
+products.category_id,
+category.cid,
+category.cname
+FROM
+category RIGHT JOIN
+products ON products.category_id = category.cid
+order by products.pid  desc
+  </select>
+  <select id="getOne" resultMap="productAndCategory">
+       SELECT
+products.pid,
+products.pname,
+products.pimg,
+products.price,
+products.flag,
+products.category_id,
+category.cid,
+category.cname
+FROM
+category RIGHT JOIN
+products ON products.category_id = category.cid
+where products.pid=#{pid}
+  </select>
+</mapper>
